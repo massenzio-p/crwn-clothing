@@ -1,8 +1,7 @@
-import firebase from "firebase/compat/app";
-import { GoogleAuthProvider, signInWithPopup, getAuth} from "firebase/auth";
-// import {getAnalytics} from "firebase/firebase-analytics";
-// import { initializeApp } from "firebase/app";
-// import analytics from "firebase/compat/analytics";
+import {GoogleAuthProvider, signInWithPopup, getAuth} from "firebase/auth";
+import {getFirestore, doc, collection, getDoc, setDoc, getDocFromServer, getDocFromCache} from 'firebase/firestore';
+import {initializeApp} from 'firebase/app'
+import {getAnalytics} from 'firebase/analytics'
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -16,13 +15,37 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-// export const analytics = getAnalytics(app);
-export const firestore = firebase.firestore;
-export const auth = getAuth();
 
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+export const firestore = getFirestore(app);
+export const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-provider.setCustomParameters({ prompt: 'select_account'});
+
+provider.setCustomParameters({prompt: 'select_account'});
 export const signInWithGoogle = () => signInWithPopup(auth, provider);
 
-export default firebase;
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+    if (!userAuth) return;
+    const userRef = doc(firestore, 'users', `${userAuth.uid}`);
+    // const userRef = doc(firestore, collection(firestore, 'users'), `${userAuth.uid}`);
+    const snapShot = await getDoc(userRef);
+
+    if (!snapShot.exists) {
+        console.log(`snapshot not exists - ${snapShot.data()}`)
+        const {displayName, email} = userAuth;
+        const createdAt = new Date();
+        try {
+            await userRef.set({
+                displayName,
+                email,
+                createdAt,
+                ...additionalData
+            });
+        } catch (error) {
+            console.log('error creating user', error.message);
+        }
+    }
+
+    return userRef;
+}
