@@ -3,7 +3,7 @@ import './menu-item.styles.scss';
 import { useNavigate } from "react-router-dom";
 
 const MenuItem = ({title, imageUrl, size, history, linkUrl, match}) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     return (
         <div
             className={`${size} menu-item`}
