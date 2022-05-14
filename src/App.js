@@ -1,7 +1,7 @@
 import './App.css';
 import HomePage from './pages/homepage/homepage.component';
 import {Route, Routes, Navigate} from "react-router-dom";
-import ShopPage from "./pages/homepage/shop/shoppage.component";
+import ShopPage from "./pages/shop/shoppage.component";
 import Header from "./components/header/header.component";
 import SignInAndSignUpPage from "./pages/sign-in-and-sign-up/sign-in-and-sign-up.component";
 import {auth, createUserProfileDocument} from "./firebase/firebase.utils";
